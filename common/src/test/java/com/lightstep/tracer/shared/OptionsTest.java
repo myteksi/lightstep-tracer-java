@@ -2,7 +2,7 @@ package com.lightstep.tracer.shared;
 
 import org.junit.Test;
 
-import static com.lightstep.tracer.shared.Options.COLLECTOR_PATH;
+import static com.lightstep.tracer.shared.Options.DEFAULT_COLLECTOR_PATH;
 import static com.lightstep.tracer.shared.Options.COMPONENT_NAME_KEY;
 import static com.lightstep.tracer.shared.Options.DEFAULT_PLAINTEXT_PORT;
 import static com.lightstep.tracer.shared.Options.DEFAULT_SECURE_PORT;
@@ -22,6 +22,7 @@ public class OptionsTest {
 
     private static final String ACCESS_TOKEN = "my-access-token";
     private static final String COLLECTOR_HOST = "my-collector-host";
+    private static final string COLLECTOR_PATH = "my-path";
     private static final String HTTPS_PROTOCOL = "https";
     private static final String COMPONENT_NAME = "my-component";
     private static final int MAX_REPORTING_INTERVAL_MILLIS = 1001;
@@ -95,6 +96,22 @@ public class OptionsTest {
     }
 
     @Test
+    public void testOptionsBuild_noPathProvided() throws Exception {
+        Options options = new Options.OptionsBuilder().build();
+
+        assertEquals(DEFAULT_COLLECTOR_PATH, options.collectorUrl.getPath());
+    }
+
+    @Test
+    public void testOptionsBuild_customPathProvided() throws Exception {
+        Options options = new Options.OptionsBuilder()
+                .withCollectorPath(COLLECTOR_PATH)
+                .build();
+
+        assertEquals(COLLECTOR_PATH, options.collectorUrl.getPath());
+    }
+
+    @Test
     public void testOptionsBuilder_fromExistingOptions() throws Exception {
         // create Options object with values configured
         Options options = createFullyPopulatedOptions();
@@ -154,6 +171,7 @@ public class OptionsTest {
                 .withAccessToken(ACCESS_TOKEN)
                 .withCollectorPort(123)
                 .withCollectorHost(COLLECTOR_HOST)
+                .withCollectorPath(COLLECTOR_PATH)
                 .withCollectorProtocol(HTTPS_PROTOCOL)
                 .withComponentName(COMPONENT_NAME)
                 .withDisableReportingLoop(true)

@@ -24,6 +24,11 @@ public final class Options {
     private static final String DEFAULT_COLLECTOR_HOST = "collector.lightstep.com";
 
     /**
+     * Path that will be used for the collector if no other path is provided.
+     */
+    static final String DEFAULT_COLLECTOR_PATH = "/_rpc/v1/reports/binary";
+
+    /**
      * Default collector port for HTTPS
      */
     static final int DEFAULT_SECURE_PORT = 443;
@@ -46,8 +51,6 @@ public final class Options {
     static final String HTTPS = "https";
 
     static final String HTTP = "http";
-
-    static final String COLLECTOR_PATH = "/_rpc/v1/reports/binary";
 
     // TAG KEYS
 
@@ -120,6 +123,7 @@ public final class Options {
         private String accessToken;
         private String collectorProtocol = HTTPS;
         private String collectorHost = DEFAULT_COLLECTOR_HOST;
+        private String collectorPath;
         private int collectorPort = -1;
         private long maxReportingIntervalMillis;
         private int maxBufferedSpans = -1;
@@ -136,6 +140,7 @@ public final class Options {
             this.collectorProtocol = options.collectorUrl.getProtocol();
             this.collectorHost = options.collectorUrl.getHost();
             this.collectorPort = options.collectorUrl.getPort();
+            this.collectorPath = options.collectorUrl.getPath();
             this.maxReportingIntervalMillis = options.maxReportingIntervalMillis;
             this.maxBufferedSpans = options.maxBufferedSpans;
             this.verbosity = options.verbosity;
@@ -180,6 +185,17 @@ public final class Options {
                 throw new IllegalArgumentException("Invalid collector host: " + collectorHost);
             }
             this.collectorHost = collectorHost;
+            return this;
+        }
+
+        /**
+         * Sets the path to which the tracer will send data. If not set, will default to the
+         * primary LightStep collector address
+         *
+         * @param collectorPath The path for the LightStep collector.
+         */
+        public OptionsBuilder withCollectorPath(String collectorPath) {
+            this.collectorPath = collectorPath;
             return this;
         }
 
@@ -287,6 +303,7 @@ public final class Options {
             defaultGuid();
             defaultMaxReportingIntervalMillis();
             defaultMaxBufferedSpans();
+            defaultCollectorPath();
 
             return new Options(accessToken, getCollectorUrl(), maxReportingIntervalMillis, maxBufferedSpans, verbosity,
                     disableReportingLoop, tags, customHeaders);
@@ -327,6 +344,12 @@ public final class Options {
             }
         }
 
+        private void defaultCollectorPath() {
+            if (collectorPath == null) {
+                collectorPath = DEFAULT_COLLECTOR_PATH
+            }
+        }
+
         private int getPort() {
             if (collectorPort > 0) {
                 return collectorPort;
@@ -339,7 +362,7 @@ public final class Options {
 
         private URL getCollectorUrl() throws MalformedURLException {
             int port = getPort();
-            return new URL(collectorProtocol, collectorHost, port, COLLECTOR_PATH);
+            return new URL(collectorProtocol, collectorHost, port, collectorPath);
         }
     }
 
