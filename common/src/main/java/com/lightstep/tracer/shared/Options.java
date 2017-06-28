@@ -123,7 +123,7 @@ public final class Options {
         private String accessToken;
         private String collectorProtocol = HTTPS;
         private String collectorHost = DEFAULT_COLLECTOR_HOST;
-        private String collectorPath;
+        private String collectorPath = DEFAULT_COLLECTOR_PATH;
         private int collectorPort = -1;
         private long maxReportingIntervalMillis;
         private int maxBufferedSpans = -1;
@@ -303,7 +303,6 @@ public final class Options {
             defaultGuid();
             defaultMaxReportingIntervalMillis();
             defaultMaxBufferedSpans();
-            defaultCollectorPath();
 
             return new Options(accessToken, getCollectorUrl(), maxReportingIntervalMillis, maxBufferedSpans, verbosity,
                     disableReportingLoop, tags, customHeaders);
@@ -341,12 +340,6 @@ public final class Options {
                         tags.put(LEGACY_COMPONENT_NAME_KEY, name);
                     }
                 }
-            }
-        }
-
-        private void defaultCollectorPath() {
-            if (collectorPath == null) {
-                collectorPath = DEFAULT_COLLECTOR_PATH
             }
         }
 
